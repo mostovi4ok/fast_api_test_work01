@@ -14,7 +14,15 @@ from sqlalchemy.sql.expression import asc, desc, literal_column
 
 from . import models, schemes, sql
 from .depends import get_current_user, get_filters, get_ordering, get_session, get_super_user
-from .errors import BaseError, MissingObjects, OwnerMismatch, UnauthorizedError, Undefined, UniqueError
+from .errors import (
+    BaseError,
+    MissingObjects,
+    OwnerMismatch,
+    SelfTransferError,
+    UnauthorizedError,
+    Undefined,
+    UniqueError,
+)
 from .middleware import session_middleware
 from .types import StatusTransfer
 
@@ -341,15 +349,7 @@ class TransferResolver(CrudResolve[schemes.Transfer, models.Transfer]):
         session: Session = Depends(get_session),
         user: models.Account = Depends(get_super_user),
     ) -> models.Transfer:
-        source = sql.get_instance_by_id(session, scheme.source, models.Account)
-        destination = sql.get_instance_by_id(session, scheme.destination, models.Account)
-        money = sql.get_instance_by_id(session, scheme.money, models.Money)
-        if source is None or destination is None or money is None:
-            raise MissingObjects()
-
-        if money.user != source.id:
-            raise OwnerMismatch()
-
+        source, destination, money = self.validate_transfer(scheme, session)
         transfer = models.Transfer(
             source=source.id,
             destination=destination.id,
@@ -403,3 +403,39 @@ class TransferResolver(CrudResolve[schemes.Transfer, models.Transfer]):
             return stmt.where(self.model.destination == user.id)
 
         return accesse_filter
+
+    def get_filtration_by_source(
+        self, user: models.Account, money: models.Money
+    ) -> sql.OneModelFiltration[sql.OneModelStatement[models.Transfer]] | None:
+        def accesse_filter(stmt: sql.OneModelStatement[models.Transfer]) -> sql.OneModelStatement[models.Transfer]:
+            return stmt.where(
+                self.model.source == user.id,
+                self.model.money == money.id,
+                self.model.status == StatusTransfer.initial,
+            )
+
+        return accesse_filter
+
+    def validate_transfer(
+        self, scheme: schemes.CreateTransfer, session: Session
+    ) -> tuple[models.Account, models.Account, models.Money]:
+        source = sql.get_instance_by_id(session, scheme.source, models.Account)
+        destination = sql.get_instance_by_id(session, scheme.destination, models.Account)
+        money = sql.get_instance_by_id(session, scheme.money, models.Money)
+
+        if source is None or destination is None or money is None:
+            raise MissingObjects()
+
+        if money.user != source.id:
+            raise OwnerMismatch()
+
+        if source.id == destination.id:
+            raise SelfTransferError()
+
+        duplicate_transfers = sql.get_all_instance(
+            session, models.Transfer, self.get_filtration_by_source(source, money)
+        )
+        if duplicate_transfers:
+            raise UniqueError()
+
+        return (source, destination, money)

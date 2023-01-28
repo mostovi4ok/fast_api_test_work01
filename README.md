@@ -21,4 +21,4 @@ HTTP/1.1 200 OK
 content-disposition: filename=money.csv
 content-type: text/csv; charset=utf-8
 ```
-Документация http://localhost:8000/redoc
+Документация http://localhost:8000/docs

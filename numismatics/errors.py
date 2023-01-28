@@ -20,3 +20,7 @@ class OwnerMismatch(BaseError):
 
 class UniqueError(BaseError):
     pass
+
+
+class SelfTransferError(BaseError):
+    pass

@@ -52,7 +52,7 @@ class Money(Base):
     description: Mapped[str] = mapped_column(String(100))
     nominal_price: Mapped[int]
     release_year: Mapped[str] = mapped_column(String(4))
-    serial_namber: Mapped[str] = mapped_column(String(30))
+    serial_number: Mapped[str] = mapped_column(String(30))
     user: Mapped[int] = mapped_column(ForeignKey(Account.id), nullable=False)
     type_money: Mapped[int] = mapped_column(ForeignKey(TypeMoney.id), nullable=False)
     currency: Mapped[int] = mapped_column(ForeignKey(Currency.id), nullable=False)
@@ -71,7 +71,7 @@ class Transfer(Base):
     creater: Mapped[int] = mapped_column(ForeignKey(Account.id), nullable=False)
     created_at: Mapped[datetime]
     closed_at: Mapped[datetime | None] = mapped_column(nullable=True, default=None)
-    comment: Mapped[str]
+    comment: Mapped[str] = mapped_column(String(100))
     money: Mapped[int] = mapped_column(ForeignKey(Money.id), nullable=False)
     status: Mapped[StatusTransfer]
 
@@ -80,4 +80,5 @@ class Transfer(Base):
         return (
             Index("activ_destination", "destination", postgresql_where=(initial_status)),
             Index("activ_transfer", "id", postgresql_where=(initial_status)),
+            Index("uniq_transfer", "source", "money", unique=True, postgresql_where=(initial_status)),
         ) + super().__table_args__
