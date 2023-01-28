@@ -1,16 +1,17 @@
 from fastapi import FastAPI
 
 from . import models, schemes
-from .api import CatalogResolve, MoneyResolve
+from .api import AccountResolver, CatalogResolve, MoneyResolve, TransferResolver, CrudResolve
 from .db import engine
 
 app = FastAPI()
-
-app.mount("/type_money/", CatalogResolve(schemes.Catalog, schemes.Catalog, models.TypeMoney).resolve_api())
-app.mount("/currency/", CatalogResolve(schemes.Catalog, schemes.Catalog, models.Currency).resolve_api())
-app.mount("/mint/", CatalogResolve(schemes.Catalog, schemes.Catalog, models.Mint).resolve_api())
-app.mount("/issuing_state/", CatalogResolve(schemes.Catalog, schemes.Catalog, models.IssuingState).resolve_api())
-app.mount("/money/", MoneyResolve().resolve_api())
+CatalogResolve(schemes.Catalog, schemes.Catalog, models.TypeMoney).connect_with_app("/type_money", app)
+CatalogResolve(schemes.Catalog, schemes.Catalog, models.Currency).connect_with_app("/currency", app)
+CatalogResolve(schemes.Catalog, schemes.Catalog, models.Mint).connect_with_app("/mint", app)
+CatalogResolve(schemes.Catalog, schemes.Catalog, models.IssuingState).connect_with_app("/issuing_state", app)
+MoneyResolve().connect_with_app("/money", app)
+AccountResolver().connect_with_app("/account", app)
+TransferResolver().connect_with_app("/transfer", app)
 
 
 @app.on_event("shutdown")
