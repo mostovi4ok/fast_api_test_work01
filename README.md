@@ -1,9 +1,9 @@
 
-- python3.11 -m venv .env 
-- source .env/bin/activate  
-- pip install -r requirements.txt 
-- export FAST_DB=postgresql+psycopg2://username:password@localhost:5432/db_name
-- uvicorn numismatics.app:app --reload
+		python3.11 -m venv .env 
+		source .env/bin/activate  
+		pip install -r requirements.txt 
+		export FAST_DB=postgresql+psycopg2://username:password@localhost:5432/db_name
+		uvicorn numismatics.app:app --reload
 
 - создать первого пользователя (админа) с помощью команды "python create_one_user.py --name=petr " 
 - пример вызова метода программой httpie  https://httpie.io/
