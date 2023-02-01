@@ -1,10 +1,10 @@
 from .db import engine
-from .models import Base
+from .models import BaseModel
 
 
 def create_all() -> None:
-    Base.metadata.create_all(engine)
+    BaseModel.metadata.create_all(engine)
 
 
 def drop_all() -> None:
-    Base.metadata.drop_all(engine)
+    BaseModel.metadata.drop_all(engine)

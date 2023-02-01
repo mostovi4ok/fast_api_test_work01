@@ -16,6 +16,7 @@ def main(db_action: Literal["create", "drop"]) -> None:
 
     if db_action == "create":
         create_all()
+
     elif db_action == "drop":
         drop_all()
 

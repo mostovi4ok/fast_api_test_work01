@@ -8,7 +8,7 @@ from sqlalchemy.orm import DeclarativeBase, Mapped, declared_attr, mapped_column
 from .types import StatusTransfer
 
 
-class Base(DeclarativeBase):
+class BaseModel(DeclarativeBase):
     __abstract__ = True
 
     id: Mapped[int] = mapped_column(primary_key=True)
@@ -19,14 +19,14 @@ class Base(DeclarativeBase):
         return (Index(f"{cls.__tablename__}_not_deleted_at", "id", postgresql_where=(column("deleted_at") != None)),)
 
 
-class Account(Base):
+class Account(BaseModel):
     __tablename__ = "account"
 
     name: Mapped[str] = mapped_column(String(30), unique=True)
     is_admin: Mapped[bool] = mapped_column(default=False)
 
 
-class Catalog(Base):
+class Catalog(BaseModel):
     __abstract__ = True
 
 
@@ -46,7 +46,7 @@ class IssuingState(Catalog):
     __tablename__ = "issuing_state"
 
 
-class Money(Base):
+class Money(BaseModel):
     __tablename__ = "money"
 
     description: Mapped[str] = mapped_column(String(100))
@@ -63,7 +63,7 @@ class Money(Base):
 initial_status = column("status") == StatusTransfer.initial.value
 
 
-class Transfer(Base):
+class Transfer(BaseModel):
     __tablename__ = "transfer"
 
     source: Mapped[int] = mapped_column(ForeignKey(Account.id), nullable=False)

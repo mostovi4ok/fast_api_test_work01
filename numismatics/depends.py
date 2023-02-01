@@ -7,11 +7,11 @@ from sqlalchemy.orm import Session
 
 from .errors import UnauthorizedError
 from .models import Account
-from .schemes import BaseScheme, Ordering
+from .schemes import BaseScheme, OrderingScheme
 
 SchemeT = TypeVar("SchemeT", bound=BaseScheme)
 
-security: HTTPBasic = HTTPBasic()
+security = HTTPBasic()
 
 
 def get_session(request: Request) -> Session:
@@ -54,4 +54,4 @@ def get_ordering(order_by: str | None = None) -> dict[str, Any]:
         for part in order_by.strip().split(",")
         if part
     }
-    return Ordering.parse_obj(fields).dict(exclude_none=True)
+    return OrderingScheme.parse_obj(fields).dict(exclude_none=True)

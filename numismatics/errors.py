@@ -2,7 +2,7 @@ class BaseError(Exception):
     pass
 
 
-class Undefined(BaseError):
+class UndefinedError(BaseError):
     pass
 
 
@@ -10,11 +10,11 @@ class UnauthorizedError(BaseError):
     pass
 
 
-class MissingObjects(BaseError):
+class MissingObjectsError(BaseError):
     pass
 
 
-class OwnerMismatch(BaseError):
+class OwnerMismatchError(BaseError):
     pass
 
 

@@ -1,15 +1,18 @@
 from fastapi import FastAPI
 
-from . import models, schemes
-from .api import AccountResolver, CatalogResolve, MoneyResolve, TransferResolver, CrudResolve
+from .api import AccountResolver, CatalogResolver, MoneyResolver, TransferResolver
 from .db import engine
+from .models import Currency, IssuingState, Mint, TypeMoney
+from .models_schemes import CatalogModelScheme
+from .schemes import CatalogScheme
 
 app = FastAPI()
-CatalogResolve(schemes.Catalog, schemes.Catalog, models.TypeMoney).connect_with_app("/type_money", app)
-CatalogResolve(schemes.Catalog, schemes.Catalog, models.Currency).connect_with_app("/currency", app)
-CatalogResolve(schemes.Catalog, schemes.Catalog, models.Mint).connect_with_app("/mint", app)
-CatalogResolve(schemes.Catalog, schemes.Catalog, models.IssuingState).connect_with_app("/issuing_state", app)
-MoneyResolve().connect_with_app("/money", app)
+
+CatalogResolver(CatalogScheme, CatalogModelScheme, TypeMoney).connect_with_app("/type_money", app)
+CatalogResolver(CatalogScheme, CatalogModelScheme, Currency).connect_with_app("/currency", app)
+CatalogResolver(CatalogScheme, CatalogModelScheme, Mint).connect_with_app("/mint", app)
+CatalogResolver(CatalogScheme, CatalogModelScheme, IssuingState).connect_with_app("/issuing_state", app)
+MoneyResolver().connect_with_app("/money", app)
 AccountResolver().connect_with_app("/account", app)
 TransferResolver().connect_with_app("/transfer", app)
 

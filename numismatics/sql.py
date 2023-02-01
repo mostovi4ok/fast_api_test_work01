@@ -4,9 +4,9 @@ from typing import Callable, TypeAlias, TypeVar
 from sqlalchemy import ColumnElement, Select, select
 from sqlalchemy.orm import Session
 
-from .models import Base
+from .models import BaseModel
 
-ModelT = TypeVar("ModelT", bound=Base)
+ModelT = TypeVar("ModelT", bound=BaseModel)
 OneModelStatement: TypeAlias = Select[tuple[ModelT]]
 SelectT = TypeVar("SelectT", bound=Select)
 OneModelFiltration: TypeAlias = Callable[[SelectT], SelectT]
@@ -39,5 +39,5 @@ def select_and_filter(
     return stmt
 
 
-def get_filter_by_existing(model: type[Base]) -> ColumnElement[bool]:
+def get_filter_by_existing(model: type[BaseModel]) -> ColumnElement[bool]:
     return model.deleted_at == None
